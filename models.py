@@ -9,6 +9,7 @@ from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 import csv
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
+import os
 
 from passlib.context import CryptContext
 
@@ -73,32 +74,36 @@ if database_connection():
     SessionLocal = sessionmaker(autocommit=False,autoflush=False, bind=engine)
     db = SessionLocal()
 
-    users_data = []
+    file_path = "/opt/user.csv"
+    if os.path.isfile(file_path):
+        users_data = []
 
-    with open("/opt/user.csv", mode='r') as csv_file:
+        with open("/opt/user.csv", mode='r') as csv_file:
+            
+            csv_reader = csv.DictReader(csv_file)
+            for row in csv_reader:
+                users_data.append({
+                    "first_name": row["first_name"],
+                    "last_name": row["last_name"],
+                    "email": row["email"],
+                    "password": row["password"]
+                })
         
-        csv_reader = csv.DictReader(csv_file)
-        for row in csv_reader:
-            users_data.append({
-                "first_name": row["first_name"],
-                "last_name": row["last_name"],
-                "email": row["email"],
-                "password": row["password"]
-            })
-    
-    for user_data in users_data:
-        existing_user = db.query(User).filter_by(email=user_data["email"]).first()
-        if existing_user:
-            continue
+        for user_data in users_data:
+            existing_user = db.query(User).filter_by(email=user_data["email"]).first()
+            if existing_user:
+                continue
 
-        new_user = User(email=user_data["email"],
-                        first_name=user_data["first_name"],
-                        last_name=user_data["last_name"],
-                        password=pwd_context.encrypt(user_data["password"])
-                        )
+            new_user = User(email=user_data["email"],
+                            first_name=user_data["first_name"],
+                            last_name=user_data["last_name"],
+                            password=pwd_context.encrypt(user_data["password"])
+                            )
 
-        db.add(new_user)
-        db.commit()
+            db.add(new_user)
+            db.commit()
+    else:
+        logger.error("CSV file doesn't exist")
     
     db.close()
 
