@@ -17,6 +17,7 @@ concurrency:
 
 jobs:
   pytest:
+    name: Pytest
     runs-on: ubuntu-latest
 
     services:
