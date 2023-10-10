@@ -11,4 +11,4 @@ def test_create_user():
     response = client.get('/healthz')
     print(response.content)
 
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_204_OK
