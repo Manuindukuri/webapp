@@ -9,7 +9,7 @@ on:
 jobs:
   pytest-merge:
     name: Pytest
-    runs-on: ubuntu-latest d
+    runs-on: ubuntu-latest
 
     services:
       postgres:
