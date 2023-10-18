@@ -185,56 +185,6 @@ async def update_assignment(id: str, data: Assignment, authorization: str = Head
     except Exception as e:
         return response( str(e), status.HTTP_408_REQUEST_TIMEOUT)
 
-@app.patch("/v1/assignments/{id}")
-async def update_assignment(id: str, data: dict, authorization: str = Header(None), db: Session = Depends(get_db)):
-    try:
-        # Check if assignment exists
-        assignment = db.query(models.Assignment).filter_by(id=id).first()
-        if not assignment:
-            return response( "Assignment not found", status.HTTP_404_NOT_FOUND)
-
-        if authorization is None:
-            return response( "Authorization header missing", status.HTTP_400_BAD_REQUEST)
-        try:
-            auth_type, encoded_code = authorization.split(" ")
-            if auth_type != "Basic":
-                return response( "Authorization type not supported", status.HTTP_400_BAD_REQUEST)
-
-            code = base64.b64decode(encoded_code).decode("utf-8")
-            email, password = code.split(":")
-
-            user = db.query(models.User).filter_by(email=email).first()
-            if not user:
-                return response( "User not found", status.HTTP_404_NOT_FOUND)
-            
-             # Check if user is authorized to access this data
-            if assignment.owner_user_id != user.id:
-                return response( "Not authorized to access other user's data", status.HTTP_403_FORBIDDEN)
-
-            if not pwd_context.verify(password, user.password):
-                return response( "Invalid authorization", status.HTTP_401_UNAUTHORIZED)
-
-            # Update assignment data
-
-            assignment.name = data.get("name", assignment.name)
-            assignment.points = data.get("points", assignment.points)
-            assignment.num_of_attemps = data.get("num_of_attemps", assignment.num_of_attemps)
-            assignment.deadline = data.get("deadline", assignment.deadline)
-
-
-            db.add(assignment)
-            db.commit()
-            db.refresh(assignment)
-
-            return response( "Assignment Updated successfully", status.HTTP_204_NO_CONTENT, log_level="info")
-
-            
-        except Exception as e:
-            return response( "Invalid authorization header : {}".format(str(e)), status.HTTP_400_BAD_REQUEST)
-
-    except Exception as e:
-        return response( str(e), status.HTTP_408_REQUEST_TIMEOUT)
-
 
 @app.delete("/v1/assignments/{id}")
 async def delete_assignment(id: str, authorization: str = Header(None), db: Session = Depends(get_db)):

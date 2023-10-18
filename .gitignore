@@ -16,3 +16,5 @@ oscrypto-ca-bundle.crt
 bh_unicode_properties.cache
 venv
 cloud.log
+*.pkrvars.hcl
+.venv
