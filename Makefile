@@ -21,13 +21,28 @@ install:
 
 runserver: 
 	( \
-	   source venv/bin//activate; \
+	   source venv/bin/activate; \
 	   uvicorn main:app --reload --host 0.0.0.0 --port 8000; \
     )
+
+server:
+	$(dir $(abspath $(firstword $(MAKEFILE_LIST))))venv/bin/uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 test: 
 	( \
 	   source venv/bin//activate; \
 	   pytest; \
     )
+
+init:
+	packer init packer
+
+fmt:
+	packer fmt packer
+	
+validate: fmt
+	packer validate packer
+
+build: init validate
+	packer build packer/debian.pkr.hcl
 	

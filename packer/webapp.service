@@ -1,0 +1,12 @@
+[Unit]
+Description=My webpp
+After=network.target
+
+[Service]
+User=admin
+WorkingDirectory=/home/admin/webapp 
+ExecStart=/usr/bin/make server
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
