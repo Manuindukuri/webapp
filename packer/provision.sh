@@ -31,6 +31,7 @@ sudo systemctl restart postgresql
 
 # Install requirements
 cd /home/admin/webapp
+cp user.csv /opt/
 sudo rm /usr/lib/python3.11/EXTERNALLY-MANAGED
 virtualenv venv
 pip3 install -r requirements.txt
