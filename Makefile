@@ -15,7 +15,7 @@ DATABASE_URL?= postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOS
 
 install:
 	( \
-       python -m venv venv; \
+       python3 -m venv venv; \
        venv/bin/pip install -r requirements.txt; \
     )
 

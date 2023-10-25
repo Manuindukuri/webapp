@@ -12,22 +12,6 @@ wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-
 sudo apt-get update
 sudo apt-get -y install postgresql-14
 
-# export variables
-export POSTGRES_USER=${POSTGRES_USER}
-export POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-export POSTGRES_DB=${POSTGRES_DB}
-export POSTGRES_PORT=${POSTGRES_PORT}
-export POSTGRES_HOST=${POSTGRES_HOST}
-
-# Create postgres user
-sudo su - postgres <<EOF
-psql -c "CREATE database ${POSTGRES_DB}"
-psql -c "CREATE USER ${POSTGRES_USER} WITH PASSWORD '${POSTGRES_PASSWORD}';"
-psql -c "GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_DB} TO ${POSTGRES_USER};"
-EOF
-sudo sed -i 's/\(scram-sha-256\|ident\|peer\)/md5/g' /etc/postgresql/14/main/pg_hba.conf
-sudo systemctl restart postgresql
-
 
 # Install requirements
 cd /home/admin/webapp
