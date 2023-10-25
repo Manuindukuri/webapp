@@ -1,9 +1,10 @@
 # python imports
 import base64
+from typing import Any
 import json
 
 # Framework Imports
-from fastapi import FastAPI, status, Request, HTTPException, Depends, Header
+from fastapi import FastAPI, status, Request, HTTPException, Depends, Header, Body
 from sqlalchemy.orm import Session
 
 # Project Imports
@@ -53,7 +54,9 @@ async def handle_method_not_allowed(request: Request, exc: HTTPException):
 
 # Health endpoint
 @app.get("/healthz")
-async def health_check():
+async def health_check(payload: Any = Body(None)):
+    if payload:
+        return response("Request cannot contain payload", status.HTTP_405_METHOD_NOT_ALLOWED, no_content=True)
     if not database_connection():
         return response("Database is not connected", status.HTTP_503_SERVICE_UNAVAILABLE, no_content=True)
     return response("Database is connected", status.HTTP_200_OK, log_level="info", no_content=True)
