@@ -2,6 +2,7 @@
 import base64
 from typing import Any
 import json
+import statsd
 
 # Framework Imports
 from fastapi import FastAPI, status, Request, HTTPException, Depends, Header, Body
@@ -19,6 +20,8 @@ from schema import LoginSerializer
 import models
 from schema import Assignment, CustomException
 from fastapi.responses import JSONResponse
+
+c = statsd.StatsClient()
 
 
 
@@ -55,6 +58,7 @@ async def handle_method_not_allowed(request: Request, exc: HTTPException):
 # Health endpoint
 @app.get("/healthz")
 async def health_check(payload: Any = Body(None)):
+    c.incr("Health")
     if payload:
         return response("Request cannot contain payload", status.HTTP_405_METHOD_NOT_ALLOWED, no_content=True)
     if not database_connection():
@@ -64,6 +68,8 @@ async def health_check(payload: Any = Body(None)):
 
 def authenticate_user(user: LoginSerializer, db: Session = Depends(get_db)):
     try:
+        if not database_connection():
+            return response("Database is not connected", status.HTTP_503_SERVICE_UNAVAILABLE, no_content=True)
         if not user.email or not user.password:
             return response("Email and password are required", status.HTTP_400_BAD_REQUEST)
 
@@ -100,7 +106,10 @@ def login(user: LoginSerializer, auth: str = Depends(authenticate_user)):
 
 @app.post("/v1/assignments")
 def create_assignment(assignment: Assignment, authorization: str = Header(None),  db: Session = Depends(get_db)):
+    c.incr("Create_Assignment")
     try:
+        if not database_connection():
+            return response("Database is not connected", status.HTTP_503_SERVICE_UNAVAILABLE, no_content=True)
 
         if authorization is None:
             return response( "Authorization header missing", status.HTTP_400_BAD_REQUEST)
@@ -141,7 +150,10 @@ def create_assignment(assignment: Assignment, authorization: str = Header(None),
 
 @app.put("/v1/assignments/{id}")
 async def update_assignment(id: str, data: Assignment, authorization: str = Header(None), db: Session = Depends(get_db)):
+    c.incr("Update_Assignment")
     try:
+        if not database_connection():
+            return response("Database is not connected", status.HTTP_503_SERVICE_UNAVAILABLE, no_content=True)
         assignment = db.query(models.Assignment).filter_by(id=id).first()
         if not assignment:
             return response( "Assignment not found", status.HTTP_404_NOT_FOUND)
@@ -191,7 +203,10 @@ async def update_assignment(id: str, data: Assignment, authorization: str = Head
 
 @app.delete("/v1/assignments/{id}")
 async def delete_assignment(id: str, authorization: str = Header(None), db: Session = Depends(get_db)):
+    c.incr("delete_Assignment")
     try:
+        if not database_connection():
+            return response("Database is not connected", status.HTTP_503_SERVICE_UNAVAILABLE, no_content=True)
         # Check if assignment exists
         assignment = db.query(models.Assignment).filter_by(id=id).first()
         if not assignment:
@@ -233,7 +248,10 @@ async def delete_assignment(id: str, authorization: str = Header(None), db: Sess
 
 @app.get("/v1/assignments/{id}")
 async def get_assignment(id: str, db: Session = Depends(get_db), authorization: str = Header(None)):
+    c.incr("Get_Assignment")
     try:
+        if not database_connection():
+            return response("Database is not connected", status.HTTP_503_SERVICE_UNAVAILABLE, no_content=True)
         # Check if assignment exists
         assignment = db.query(models.Assignment).filter_by(id=id).first()
         if not assignment:
@@ -273,13 +291,14 @@ async def get_assignment(id: str, db: Session = Depends(get_db), authorization: 
 
 @app.get("/v1/assignments")
 async def get_assignments(db: Session = Depends(get_db)):
+    c.incr("Get_Assignment_List")
     try:
+        if not database_connection():
+            return response("Database is not connected", status.HTTP_503_SERVICE_UNAVAILABLE, no_content=True)
         assignments = db.query(models.Assignment).all()
 
         
         assignments_data = [assignment.to_dict() for assignment in assignments]
-        print(assignments_data)
-
         logger.info("Images fetched successfully 200")
         return assignments_data
 
