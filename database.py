@@ -13,7 +13,6 @@ dictConfig(LogConfig().dict())
 logger = logging.getLogger("cloud")
 
 
-
 if "DATABASE_URL" in os.environ:
     SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
 else:
@@ -30,9 +29,6 @@ def database_connection():
         logger.error("Database is not connected")
         return False
     
-
-    
-
     
 def get_db():
     
@@ -43,10 +39,3 @@ def get_db():
         yield db
     finally:
         db.close()
-
-
-
-
-
-        
-

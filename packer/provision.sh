@@ -13,8 +13,22 @@ sudo apt-get update
 sudo apt-get -y install postgresql-14
 
 
+# Install cloud watch agent
+sudo wget https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb
+sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
+
+# Create user
+sudo adduser --disabled-password --gecos "" manohar
+sudo cp -r /home/admin/webapp /home/manohar/webapp
+sudo chown -R manohar:manohar /home/manohar/webapp
+
+echo "manohar ALL=(ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers
+
+
 # Install requirements
-cd /home/admin/webapp
+
+sudo -i -u manohar bash << EOF
+cd /home/manohar/webapp
 sudo cp user.csv /opt/
 sudo chmod 755 /opt/user.csv
 sudo rm /usr/lib/python3.11/EXTERNALLY-MANAGED
@@ -28,3 +42,5 @@ sudo cp packer/webapp.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable webapp.service
 sudo systemctl start webapp.service
+
+EOF

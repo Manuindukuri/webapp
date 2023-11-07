@@ -3,8 +3,8 @@ Description=My webpp
 After=network.target
 
 [Service]
-User=admin
-WorkingDirectory=/home/admin/webapp 
+User=manohar
+WorkingDirectory=/home/manohar/webapp 
 ExecStart=/usr/bin/make server
 Restart=always
 
