@@ -58,7 +58,9 @@ async def handle_method_not_allowed(request: Request, exc: HTTPException):
 # Health endpoint
 @app.get("/healthz")
 async def health_check(payload: Any = Body(None)):
+
     c.incr("Health")
+
     if payload:
         return response("Request cannot contain payload", status.HTTP_405_METHOD_NOT_ALLOWED, no_content=True)
     if not database_connection():

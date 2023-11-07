@@ -12,6 +12,7 @@ wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-
 sudo apt-get update
 sudo apt-get -y install postgresql-14
 
+
 # Install cloud watch agent
 sudo wget https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb
 sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
@@ -22,6 +23,7 @@ sudo cp -r /home/admin/webapp /home/manohar/webapp
 sudo chown -R manohar:manohar /home/manohar/webapp
 
 echo "manohar ALL=(ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers
+
 
 # Install requirements
 

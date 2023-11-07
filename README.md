@@ -15,7 +15,7 @@ This is a Fast API for managing user data. It includes APIs for health check.
 ```bash
 make install
 ```
-5. Export the database configurations to the environment. 
+5. Export the database configurations to the environment. ..
 ```bash
 export DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
 ```
