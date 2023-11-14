@@ -5,7 +5,7 @@ This is a Fast API for managing user data. It includes APIs for health check.
 
 ### Requirements
 - Python 3.x
-- Fast API
+- Fast API : Uvicorn
 
 ### Installation
 1. Clone the repository to your local machine and cd into cloud.
