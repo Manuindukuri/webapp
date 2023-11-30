@@ -66,6 +66,28 @@ class Assignment(Base):
 
 User.assignments = relationship("Assignment",order_by= "Assignment.id" , back_populates="user")
 
+class Submission(Base):
+    __tablename__ = 'submissions'
+
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
+    assignment_id = Column(UUID(as_uuid=True), ForeignKey("assignments.id"), nullable=False, index=True)
+    submission_url = Column(String)
+    submission_date = Column(DateTime, default=datetime.utcnow)
+    submission_updated = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    assignment = relationship("Assignment", back_populates="submissions")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "assignment_id": self.assignment_id,
+            "submission_url": self.submission_url,
+            "submission_date": self.submission_date,
+            "submission_updated": self.submission_updated,
+        }
+
+Assignment.submissions = relationship("Submission", back_populates="assignment", order_by= "Submission.id")
+
 if database_connection():
     logger.info("Database is connected")
     engine = create_engine(SQLALCHEMY_DATABASE_URL)
