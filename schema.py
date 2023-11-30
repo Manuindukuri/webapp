@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, HttpUrl
 from fastapi import status
 from datetime import datetime
 
@@ -23,8 +23,9 @@ class User(BaseModel):
 
 class Assignment(BaseModel):
     def __init__(self, **data):
+        if any(item not in ["name", "points", "num_of_attemps", "deadline"] for item in data.keys()):
+            raise CustomException(status.HTTP_400_BAD_REQUEST, {"keys":"Please provide correct parameters"})
         for key, value in data.items():
-            print(key)
             if isinstance(value, int) and key not in ["points", "num_of_attemps"]:
                 raise CustomException(status.HTTP_400_BAD_REQUEST, {key: "The value should be string"})
             if key in ["points", "num_of_attemps"] and (isinstance(value, str) or isinstance(value, float)):
@@ -35,6 +36,18 @@ class Assignment(BaseModel):
     points: int = Field(ge=1, le=10)
     num_of_attemps: int = Field(ge=1, le=100)
     deadline: datetime
+
+    class Config:
+        orm_mode = True
+
+class Submission(BaseModel):
+
+    def __init__(self, **data):
+        if any(item not in ["submission_url"] for item in data.keys()):
+            raise CustomException(status.HTTP_400_BAD_REQUEST, {"keys":"Please provide correct parameters"})
+        super().__init__(**data)
+
+    submission_url: HttpUrl
 
     class Config:
         orm_mode = True
