@@ -86,7 +86,7 @@ jobs:
         latest_ami=$(aws ec2 describe-images --executable-users self --query 'sort_by(Images, &CreationDate)[-1].ImageId' --output text)
         echo "Latest AMI ID: $latest_ami"
 
-        version_number=$(aws ec2 describe-launch-template-versions --launch-template-name asg_launch_config --query 'sort_by(LaunchTemplateVersions, &VersionNumber)[-1].VersionNumber' --output text)
+        version_number=$(aws ec2 describe-launch-template-versions --launch-template-name webAppLaunchTemplate --query 'sort_by(LaunchTemplateVersions, &VersionNumber)[-1].VersionNumber' --output text)
         echo "Latest AMI version: $version_number"
 
         echo "latest_ami=$latest_ami" >> $GITHUB_OUTPUT
@@ -94,8 +94,8 @@ jobs:
 
     - name: Create new Launch Template version
       run: |
-        aws ec2 create-launch-template-version --launch-template-name asg_launch_config  --launch-template-data "ImageId=${{ steps.vars.outputs.latest_ami }}" --source-version ${{ steps.vars.outputs.version_number }}
+        aws ec2 create-launch-template-version --launch-template-name webAppLaunchTemplate  --launch-template-data "ImageId=${{ steps.vars.outputs.latest_ami }}" --source-version ${{ steps.vars.outputs.version_number }}
     
     - name: Autoscaling group instance refresh
       run: |
-        aws autoscaling start-instance-refresh --auto-scaling-group-name csye6225-asg-spring2023 --strategy Rolling --desired-configuration '{"LaunchTemplate": {"LaunchTemplateName":"asg_launch_config", "Version":"$Latest"}}'
+        aws autoscaling start-instance-refresh --auto-scaling-group-name webAppAutoScalingGroup --strategy Rolling --desired-configuration '{"LaunchTemplate": {"LaunchTemplateName":"webAppLaunchTemplate", "Version":"$Latest"}}'
