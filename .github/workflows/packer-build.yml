@@ -99,3 +99,25 @@ jobs:
     - name: Autoscaling group instance refresh
       run: |
         aws autoscaling start-instance-refresh --auto-scaling-group-name webAppAutoScalingGroup --strategy Rolling --desired-configuration '{"LaunchTemplate": {"LaunchTemplateName":"webAppLaunchTemplate", "Version":"$Latest"}}'
+
+    - name: Check the status of instance refresh
+      run: |
+        status="Pending"
+        retries=0
+
+        # Poll the status using the describe-instance-refreshes command
+        while [ "$status" != "Successful" ] && [ "$status" != "Cancelled" ] && [ "$retries" -lt 30 ]; do
+          sleep 60s  # Wait for 60 seconds before polling again
+
+          # Retrieve the instance refresh status
+          status=$(aws autoscaling describe-instance-refreshes --auto-scaling-group-name webAppAutoScalingGroup --query 'InstanceRefreshes[0].Status' --output text)
+
+          # Increment retries
+          retries=$((retries+1))
+        done
+
+        # Check the final status
+        if [ "$status" != "Successful" ] && [ "$status" != "Cancelled" ]; then
+          echo "Instance refresh did not complete successfully. Exiting..."
+          exit 1
+        fi
