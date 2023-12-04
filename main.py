@@ -105,7 +105,7 @@ def authenticate_user(user: LoginSerializer, db: Session = Depends(get_db)):
         return response( str(e), status.HTTP_408_REQUEST_TIMEOUT)
 
 
-@app.post("/v1/user/login")
+@app.post("/v2/user/login")
 def login(user: LoginSerializer, auth: str = Depends(authenticate_user)):
     return auth
 
@@ -113,7 +113,7 @@ def login(user: LoginSerializer, auth: str = Depends(authenticate_user)):
 
 ############################################################################################
 
-@app.post("/v1/assignments")
+@app.post("/v2/assignments")
 def create_assignment(assignment: Assignment, authorization: str = Header(None),  db: Session = Depends(get_db)):
     c.incr("Create_Assignment")
     try:
@@ -162,7 +162,7 @@ def create_assignment(assignment: Assignment, authorization: str = Header(None),
 
 
 
-@app.put("/v1/assignments/{id}")
+@app.put("/v2/assignments/{id}")
 async def update_assignment(id: str, data: Assignment, authorization: str = Header(None), db: Session = Depends(get_db)):
     c.incr("Update_Assignment")
     try:
@@ -215,7 +215,7 @@ async def update_assignment(id: str, data: Assignment, authorization: str = Head
         return response( str(e), status.HTTP_408_REQUEST_TIMEOUT)
 
 
-@app.delete("/v1/assignments/{id}")
+@app.delete("/v2/assignments/{id}")
 async def delete_assignment(id: str, authorization: str = Header(None), db: Session = Depends(get_db)):
     c.incr("delete_Assignment")
     try:
@@ -260,7 +260,7 @@ async def delete_assignment(id: str, authorization: str = Header(None), db: Sess
             return response( str(e), status.HTTP_408_REQUEST_TIMEOUT)
 
 
-@app.get("/v1/assignments/{id}")
+@app.get("/v2/assignments/{id}")
 async def get_assignment(id: str, db: Session = Depends(get_db), authorization: str = Header(None)):
     c.incr("Get_Assignment")
     try:
@@ -303,7 +303,7 @@ async def get_assignment(id: str, db: Session = Depends(get_db), authorization: 
             return response( str(e), status.HTTP_408_REQUEST_TIMEOUT)
     
 
-@app.get("/v1/assignments")
+@app.get("/v2/assignments")
 async def get_assignments(db: Session = Depends(get_db)):
     c.incr("Get_Assignment_List")
     try:
@@ -320,7 +320,7 @@ async def get_assignments(db: Session = Depends(get_db)):
         return response( "Invalid authorization header : {}".format(str(e)), status.HTTP_400_BAD_REQUEST)
     
 
-@app.post("/v1/assignments/{id}/submission")
+@app.post("/v2/assignments/{id}/submission")
 async def create_submission(submission: Submission, id: str, db: Session = Depends(get_db), authorization: str = Header(None)):
     try:
         if not database_connection():
