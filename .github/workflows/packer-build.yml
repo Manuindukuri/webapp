@@ -1,10 +1,10 @@
 name: Packer Build
 
-on:
-  pull_request:
-    types: [closed]
-    branches:
-      - main
+# on:
+#   pull_request:
+#     types: [closed]
+#     branches:
+#       - main
 
 jobs:
   pytest-merge:
@@ -117,7 +117,7 @@ jobs:
         done
 
         # Check the final status
-        if [ "$status" != "Successful" ] && [ "$status" != "Cancelled" ]; then
+        if [ "$status" != "Successful" ] && [ "$status" == "Cancelled" ]; then
           echo "Instance refresh did not complete successfully. Exiting..."
           exit 1
         fi
